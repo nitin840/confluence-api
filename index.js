@@ -1,9 +1,7 @@
 const express = require('express')
 const app = express()
 
-var db = require('./db')
-
-var imageRouter = require('./imageController')
-app.use('/image',imageRouter)
+var imageRouter = require('./controller')
+app.use('/confluence',imageRouter)
 
 module.exports = app
