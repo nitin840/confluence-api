@@ -3,8 +3,8 @@ var router = express.Router()
 var bodyParser = require('body-parser')
 var jwt = require('jsonwebtoken')
 var request = require('request')
-
-var secretKey = Buffer.from('Hello World!','utf8').toString('base64')
+const postURL = 'https://yapihew.atlassian.net'
+const secretKey = Buffer.from('Hello World!','utf8').toString('base64')
 
 router.use(bodyParser.urlencoded({extended:true}))
 router.use(bodyParser.json())
@@ -75,60 +75,54 @@ router.get('/fetch',(req,res)=>{
 //getting page content
 router.get('/atlassian',(req,res)=>{
 
-     var options = {
-        method: 'GET',
-        url: 'https://yapihew.atlassian.net/wiki/rest/api/content',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic eWFwaWhldzY3NUBtYWlsZmlsZS5vcmc6ZDA5Y0hIeEhCMVdlbWM2RzVLemVBNUUw'
-        }
+    var options = {
+      method: 'GET',
+      url: postURL + '/wiki/rest/api/content',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic' + process.env.ATLASSIAN_TOKEN
+      }
     }
     request(options,function(error,response,body){
 
         if (error) {
-            //throw new Error(error);
              res.json({
                  error
              })
         }
         console.log('Response: ' + response.statusCode + ' ' + response.statusMessage)
         res.json({
-         message: "successfully",
-         data: JSON.parse(body)
+          message: "successfully",
+          data: JSON.parse(body)
         });
      
- })
-    
     })
+    
+})
 
 //getting page template
 router.get('/ok',verifyToken,(req,res)=>{
 
     var options = {
-       method: 'GET',
-       url: 'https://yapihew.atlassian.net/wiki/rest/api/template/7733501',
-       headers: {
-           'Content-Type': 'application/json',
-           'Authorization': 'Basic eWFwaWhldzY3NUBtYWlsZmlsZS5vcmc6ZDA5Y0hIeEhCMVdlbWM2RzVLemVBNUUw'
-       }
-   }
+        method: 'GET',
+        url: postURL + '/wiki/rest/api/template/7733501',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic' + process.env.ATLASSIAN_TOKEN
+        }
+    }
 
     request(options,function(error,response,body){
-
-           if (error) {
-              // throw new Error(error);
-                res.json({
-                    message :"erroor : ",error
-                })
-           }
-           console.log(
-            'Response: ' + response.statusCode + ' ' + response.statusMessage
-         );
-          var a =JSON.parse(body)
-           res.json(JSON.stringify(a.body.storage.value));
-        
+        if (error) {
+            // throw new Error(error);
+              res.json({
+                  message :"erroor : ",error
+              })
+        }
+        console.log('Response: ' + response.statusCode + ' ' + response.statusMessage)
+        var a =JSON.parse(body)
+        res.json(JSON.stringify(a.body.storage.value));
     })
-   
 })
 
 //simply creating page from bodyData
@@ -153,34 +147,32 @@ router.post('/createPage/:title/:content',(req,res)=>{
             }
         }
     }`;
-   
-    
+
     //res.send(bodyData)
     var options = {
         method: 'POST',
-        url: 'https://yapihew.atlassian.net/wiki/rest/api/content',
+        url: postURL + '/wiki/rest/api/content',
         headers: {
            'Content-Type': 'application/json',
-           'Authorization': 'Basic eWFwaWhldzY3NUBtYWlsZmlsZS5vcmc6ZDA5Y0hIeEhCMVdlbWM2RzVLemVBNUUw'
+           'Authorization': 'Basic' + process.env.ATLASSIAN_TOKEN
         },
         body: bodyData
-     };
+     }
      
-     request(options, function (error, response, body) {
-        //if (error) throw new Error(error);
-        if (error) {
-           // throw new Error(error);
-            res.json({
-                 message :"erroor : ",error
-             });
-        }
-        console.log(
-           'Response: ' + response.statusCode + ' ' + response.statusMessage
-        );
-        console.log(body);
-        res.send(body)
-     });
-
+    request(options, function (error, response, body) {
+      //if (error) throw new Error(error);
+      if (error) {
+          // throw new Error(error);
+          res.json({
+                message :"erroor : ",error
+            });
+      }
+      console.log(
+          'Response: ' + response.statusCode + ' ' + response.statusMessage
+      );
+      console.log(body);
+      res.send(body)
+    });
 })
 
 //get template and create page
@@ -192,8 +184,7 @@ router.get("/templatePage/:countryName/:countryCode", (req, res) => {
       url: "https://yapihew.atlassian.net/wiki/rest/api/template/" + templateId,
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          "Basic eWFwaWhldzY3NUBtYWlsZmlsZS5vcmc6ZDA5Y0hIeEhCMVdlbWM2RzVLemVBNUUw"
+        Authorization: 'Basic' + process.env.ATLASSIAN_TOKEN
       }
     };
   
@@ -234,8 +225,7 @@ router.get("/templatePage/:countryName/:countryCode", (req, res) => {
         url: "https://yapihew.atlassian.net/wiki/rest/api/content",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "Basic eWFwaWhldzY3NUBtYWlsZmlsZS5vcmc6ZDA5Y0hIeEhCMVdlbWM2RzVLemVBNUUw"
+          Authorization: 'Basic' + process.env.ATLASSIAN_TOKEN
         },
         body: bodyData
       };
